@@ -7,9 +7,9 @@ import { chart, child, lorem, parent, table } from "../helpers";
 export default parent({
   order: 15,
   title: "News & Stock Buzz",
-  // One short line in the standard link block of every story: "News & Stock Buzz: <storyLine>".
-  storyLine: lorem("line"),
-  // One sentence: what the reader gets by clicking. Be specific.
+  // PROMISE = the hyperlinked text readers see in the standard link block of every report
+  // (kickoff v3 §10, plan §3.2). One specific sentence on what the click gets them, e.g.
+  // "see the full debt summary" renders as "News & Stock Buzz: <promise>".
   promise: lorem("sentence"),
   summary: {
     // Own real content on the landing page. Never just a menu.
@@ -18,13 +18,16 @@ export default parent({
   },
   // ONE table or chart we already produce. Replace the placeholder rows or points.
   visual: table("Recent and top stories", ["Date", "Story", "Why it mattered"]),
-  // 3-5 children. Set live: false on a child to take it off the page (dormant).
+  // 3-5 children. Each child card shows its `headline` (the finding, up front) and its `promise`
+  // (the hyperlinked text). Set live: false on a child to take it off the page (dormant).
   children: [
     child("Recent & Top News", {
-      hint: "Recent stories plus the top stories of the past year and why they mattered.",
+      headlineHint: "Latest developments and the year's major stories.",
+      unlocksHint: "Recent stories plus the top stories of the past year and why they mattered.",
     }),
     child("Stock Buzz", {
-      hint: "What is driving current attention.",
+      headlineHint: "Whether the stock is currently in the news.",
+      unlocksHint: "What is driving current attention.",
     }),
   ],
   // The quiet "visit Stock Dashboard" strip, shown below the child links.

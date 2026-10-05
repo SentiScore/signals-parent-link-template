@@ -9,7 +9,9 @@ import { Visual } from "./Visual";
 
 /**
  * THE template. One layout for all 15 parents; only the content object changes.
- * Order (kickoff v3 §3.4): promise → summary → one table/chart → 3-5 child links → quiet Stock Dashboard strip.
+ * Order (kickoff v3 §3.4): summary (fulfils the parent promise the reader clicked) → one table/chart
+ * → 3-5 child links → quiet Stock Dashboard strip.
+ * The parent promise itself is the link text in the report, so it is not repeated here.
  */
 export function ParentLanding({ parent, companyName, ctx }: { parent: ParentContent; companyName: string; ctx: LinkContext }) {
   const hasPeers = !!parent.peerLinks?.length;
@@ -25,7 +27,6 @@ export function ParentLanding({ parent, companyName, ctx }: { parent: ParentCont
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-2">{companyName}</p>
           <h1 className="serif mt-2 text-4xl leading-tight sm:text-5xl">{parent.title}</h1>
-          <Ph as="p" className="mt-3 max-w-xl text-base leading-relaxed text-muted">{parent.promise}</Ph>
         </div>
 
         <section aria-label="Summary" className="rounded-2xl border border-line bg-card p-5 sm:p-6">

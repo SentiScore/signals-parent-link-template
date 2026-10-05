@@ -7,9 +7,9 @@ import { chart, child, lorem, parent, table } from "../helpers";
 export default parent({
   order: 12,
   title: "Customers, Supply Chain & Inventory",
-  // One short line in the standard link block of every story: "Customers, Supply Chain & Inventory: <storyLine>".
-  storyLine: lorem("line"),
-  // One sentence: what the reader gets by clicking. Be specific.
+  // PROMISE = the hyperlinked text readers see in the standard link block of every report
+  // (kickoff v3 §10, plan §3.2). One specific sentence on what the click gets them, e.g.
+  // "see the full debt summary" renders as "Customers, Supply Chain & Inventory: <promise>".
   promise: lorem("sentence"),
   summary: {
     // Own real content on the landing page. Never just a menu.
@@ -18,16 +18,20 @@ export default parent({
   },
   // ONE table or chart we already produce. Replace the placeholder rows or points.
   visual: table("Dependency snapshot", ["Item", "Share or level", "Change"]),
-  // 3-5 children. Set live: false on a child to take it off the page (dormant).
+  // 3-5 children. Each child card shows its `headline` (the finding, up front) and its `promise`
+  // (the hyperlinked text). Set live: false on a child to take it off the page (dormant).
   children: [
     child("Customer Concentration", {
-      hint: "Largest customers and their share of revenue.",
+      headlineHint: "Whether concentration risk exists.",
+      unlocksHint: "Largest customers and their share of revenue.",
     }),
     child("Supplier & Vendor Exposure", {
-      hint: "Specific suppliers and geographic exposure.",
+      headlineHint: "A key supplier dependency.",
+      unlocksHint: "Specific suppliers and geographic exposure.",
     }),
     child("Inventory & Backlog", {
-      hint: "Detailed trend and what it implies for revenue.",
+      headlineHint: "Whether inventory or backlog is rising or falling.",
+      unlocksHint: "Detailed trend and what it implies for revenue.",
     }),
   ],
   // The quiet "visit Stock Dashboard" strip, shown below the child links.

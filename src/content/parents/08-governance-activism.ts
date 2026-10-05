@@ -7,9 +7,9 @@ import { chart, child, lorem, parent, table } from "../helpers";
 export default parent({
   order: 8,
   title: "Governance & Activism",
-  // One short line in the standard link block of every story: "Governance & Activism: <storyLine>".
-  storyLine: lorem("line"),
-  // One sentence: what the reader gets by clicking. Be specific.
+  // PROMISE = the hyperlinked text readers see in the standard link block of every report
+  // (kickoff v3 §10, plan §3.2). One specific sentence on what the click gets them, e.g.
+  // "see the full debt summary" renders as "Governance & Activism: <promise>".
   promise: lorem("sentence"),
   summary: {
     // Own real content on the landing page. Never just a menu.
@@ -18,16 +18,20 @@ export default parent({
   },
   // ONE table or chart we already produce. Replace the placeholder rows or points.
   visual: table("Control and governance snapshot", ["Item", "Detail", "Date"]),
-  // 3-5 children. Set live: false on a child to take it off the page (dormant).
+  // 3-5 children. Each child card shows its `headline` (the finding, up front) and its `promise`
+  // (the hyperlinked text). Set live: false on a child to take it off the page (dormant).
   children: [
     child("Activist Involvement", {
-      hint: "The activist's stated demands and track record.",
+      headlineHint: "That an activist has taken a position.",
+      unlocksHint: "The activist's stated demands and track record.",
     }),
     child("Control & Related-Party Issues", {
-      hint: "Control structure and related-party details.",
+      headlineHint: "A dual-class structure or related-party transaction.",
+      unlocksHint: "Control structure and related-party details.",
     }),
     child("Board Changes & Disputes", {
-      hint: "Board composition changes and background.",
+      headlineHint: "A board change or dispute.",
+      unlocksHint: "Board composition changes and background.",
       flags: ["check"],
     }),
   ],

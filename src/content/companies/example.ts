@@ -8,12 +8,13 @@ export const example: CompanyContent = {
   parents: {
     // key = parent slug
     "debt-refinancing": {
+      // The hyperlinked text in this company's report link block.
       promise: "Lorem ipsum dolor sit amet, company-specific promise.",
       // Arrays (metrics, table rows) are replaced whole, objects are merged.
       summary: { body: "Lorem ipsum dolor sit amet, company-specific summary." },
       children: {
         // key = child id. Put real links here as the analyst team delivers them.
-        maturity_wall: { href: "https://example.com/replace-me", promise: "Lorem ipsum dolor sit amet." },
+        maturity_wall: { href: "https://example.com/replace-me", headline: "Lorem ipsum", promise: "Lorem ipsum dolor sit amet." },
         // Dormant child: disappears from the page until set back to true.
         credit_rating_history: { live: false },
       },

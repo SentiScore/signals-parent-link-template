@@ -24,7 +24,7 @@ for (const base of PARENTS) {
   const p = resolveParent(base, process.env.COMPANY ?? Object.keys(COMPANIES)[0] ?? "example-co");
   if (p.children.length < 1) err("no live children");
   if (p.children.length > MAX_CHILDREN) err(`${p.children.length} live children (max ${MAX_CHILDREN})`);
-  const texts: [string, string][] = [["storyLine", p.storyLine], ["promise", p.promise], ["summary.body", p.summary.body], ...p.summary.metrics.map((m): [string, string] => [`metric ${m.label}`, m.value]), ...p.children.map((c): [string, string] => [`child ${c.id}.promise`, c.promise])];
+  const texts: [string, string][] = [["promise", p.promise], ["summary.body", p.summary.body], ...p.summary.metrics.map((m): [string, string] => [`metric ${m.label}`, m.value]), ...p.children.flatMap((c): [string, string][] => [[`child ${c.id}.headline`, c.headline], [`child ${c.id}.promise`, c.promise]])];
   const open = texts.filter(([, t]) => isPlaceholder(t)).length;
   todo += open;
   const flags = p.children.filter((c) => c.flags?.length).map((c) => `${c.title} (${c.flags!.join(",")})`);

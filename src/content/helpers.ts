@@ -16,11 +16,12 @@ export function lorem(kind: "line" | "sentence" | "paragraph" = "sentence"): str
 
 export const isPlaceholder = (s: string | undefined) => !!s && /^lorem ipsum/i.test(s.trim());
 
-export function child(title: string, opts: { id?: string; hint?: string; flags?: Flag[]; href?: string; live?: boolean } = {}): ChildContent {
+export function child(title: string, opts: { id?: string; headlineHint?: string; unlocksHint?: string; flags?: Flag[]; href?: string; live?: boolean } = {}): ChildContent {
   return {
     id: idify(title),
     slug: slugify(title),
     title,
+    headline: lorem("line"),
     promise: lorem("sentence"),
     live: true,
     ...opts,

@@ -28,16 +28,16 @@ One file per parent: `src/content/parents/NN-<parent>.ts` (15 files). Each holds
 
 | Field | What the analysts provide |
 |---|---|
-| `storyLine` | Short headline used in the story link block |
-| `promise` | One specific sentence: what the reader gets by clicking |
+| `promise` | **The hyperlinked text readers see in the report's link block** ("Debt & Refinancing: *see the full debt summary*"). One specific sentence on what the click gets them |
 | `summary.metrics[]` | Headline figures (labels are already set; replace the `value`s) |
 | `summary.body` | 2-3 sentence summary. Must carry real content |
 | `visual` | The ONE table or chart we already produce (`table()` / `chart()` helpers) |
-| `children[].promise` | One sentence per child link |
+| `children[].headline` | The headline finding shown up front on the child card (kickoff §5 "Headline shown") |
+| `children[].promise` | **The hyperlinked text on the child card**: what that click unlocks |
 | `crossover.hook` | Optional-detour copy for the strip (a draft is already written) |
 
 Rules from the kickoff doc, enforced by `npm run check:content`: 1-5 live children per parent, no duplicate ids.
-Child `hint` fields hold the kickoff "detail unlocked" text as analyst reference (never rendered).
+Child `headlineHint` and `unlocksHint` fields hold the kickoff §5 "Headline shown" and "Detail unlocked" text as analyst reference (never rendered).
 Child `flags` (`check`, `watch`) are the kickoff review statuses and print in the check output.
 
 Content differs per company? Add `src/content/companies/<company>.ts` (copy `example.ts`) and register it in `companies/index.ts`.
@@ -85,7 +85,7 @@ then check GA4 DebugView and a row in BST-DB per event type.
 ### Also needed before production (all small, all marked `TODO(dev)`)
 
 1. **Token verification**: `hasValidToken` in `src/lib/context.ts`. Today any token passes. No valid token must redirect to the public site (already coded).
-2. **Link minting**: a new link per story, topic, company, platform and placement (kickoff §9). `src/lib/story-block.ts` shows the shape the story templates consume (branded heading + one line per live parent, fixed order).
+2. **Link minting**: a new link per story, topic, company, platform and placement (kickoff §9). `src/lib/story-block.ts` builds the block the report templates consume: a Greenwich-branded heading, then one line per live parent in fixed order, "<title>: <promise>" with the promise as the hyperlink (`storyBlock()` for data, `storyBlockHtml()` for an HTML snippet). The gallery page renders it.
 3. **Redeploy with `SIGNALS_PREVIEW` unset** (it bypasses the token and enables the gallery). Never set it in production.
 4. Footer disclaimer and last-refreshed date text (`ParentLanding.tsx`).
 
@@ -99,7 +99,13 @@ are carried in the URL **for tracking only** (kickoff §9) and are never rendere
 
 ## Page structure (same for all 15 parents)
 
-Kickoff v3 §3.4 / §3.5: **promise → summary with real figures → one table or chart → 3-5 child links → quiet optional-detour strip.**
+Kickoff v3 §3.4 / §3.5: **summary with real figures → one table or chart → 3-5 child links → quiet optional-detour strip.**
+
+### What "promise" means (kickoff v3 §10, plan §3.2)
+A promise is the **clickable text a reader sees before deciding to click**: "what the reader gets by clicking".
+"See the year-by-year maturity schedule" gets clicks; "Learn more about debt" doesn't.
+- **Parent promise** = the hyperlinked text in the report's standard link block. It is *not* repeated on the landing page; the landing page summary is what fulfils it.
+- **Child promise** = the hyperlinked text on each child card, under the child's **headline finding** (shown up front; the detail stays behind the click, per the value-gate rule §2.2).
 Branding is Greenwich Research News Data (logo header, green and navy palette sampled from the logo). Colours are tokens in `src/app/globals.css`;
 logo is `public/brand/greenwich-logo.png`; brand strings are in `src/config/site.ts`.
 
@@ -129,8 +135,8 @@ The token gate is the real protection, so make tokens unguessable and don't past
 
 | Task | Edit |
 |---|---|
-| Write a parent's promise, summary, table or chart | `src/content/parents/NN-<parent>.ts` |
-| Write a child promise or set its destination | the `child(...)` entry (`promise`, `href`) |
+| Write a parent's promise (report link text), summary, table or chart | `src/content/parents/NN-<parent>.ts` |
+| Write a child's headline finding, promise (link text) or destination | the `child(...)` entry (`headline`, `promise`, `href`) |
 | Take a child or parent offline | `live: false` |
 | Run with fewer than 15 parents | `live: false` on the parent |
 | Company-specific content | `src/content/companies/` |

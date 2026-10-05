@@ -29,8 +29,10 @@ export const CROSSOVER = {
   reassurance: "Free to explore. Your research above stays one click away.",
 };
 
-/** Standard story link block: heading and per-line suffix so the block carries the Greenwich brand. */
+/**
+ * Standard link block in every report: a Greenwich-branded heading, then one line per live parent,
+ * "<title>: <promise>", where the promise is the hyperlinked text.
+ */
 export const STORY_BLOCK = {
   heading: "Greenwich Research News Data: go deeper on {company}",
-  lineSuffix: " (Greenwich)",
 };

@@ -12,7 +12,9 @@ export type ChildContent = {
   id: string;
   slug: string;
   title: string;
-  /** Reader-facing one-sentence promise: what the click unlocks. */
+  /** Headline finding shown up front on the child card (kickoff v3 §5 "Headline shown"). */
+  headline: string;
+  /** PROMISE: the hyperlinked text on the child card. One specific sentence on what the click gets the reader (kickoff v3 §10). */
   promise: string;
   /**
    * Destination. Leave unset to use the built-in child page route
@@ -22,8 +24,10 @@ export type ChildContent = {
   href?: string;
   /** false = dormant: removed from the page until it can be filled and refreshed. */
   live: boolean;
-  /** Analyst reference from kickoff v3 (what the child unlocks). Never rendered. */
-  hint?: string;
+  /** Analyst reference: kickoff v3 §5 "Headline shown" text. Never rendered. */
+  headlineHint?: string;
+  /** Analyst reference: kickoff v3 §5 "Detail unlocked at the child link". Never rendered. */
+  unlocksHint?: string;
   flags?: Flag[];
 };
 
@@ -35,9 +39,11 @@ export type ParentContent = {
   title: string;
   /** false = dormant: removed from the standard link block and the landing page. */
   live: boolean;
-  /** Short headline for the standard link block line. */
-  storyLine: string;
-  /** One-sentence promise shown under the page title. */
+  /**
+   * PROMISE: the hyperlinked text readers see in the report's standard link block, rendered
+   * "<title>: <promise>" (kickoff v3 §10, plan §3.2). It is what readers decide to click on.
+   * Not repeated on the landing page: the summary is what fulfils it (kickoff v3 §3.4).
+   */
   promise: string;
   summary: { body: string; metrics: Metric[] };
   visual: Visual;

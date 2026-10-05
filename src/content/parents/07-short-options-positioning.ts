@@ -7,9 +7,9 @@ import { chart, child, lorem, parent, table } from "../helpers";
 export default parent({
   order: 7,
   title: "Short & Options Positioning",
-  // One short line in the standard link block of every story: "Short & Options Positioning: <storyLine>".
-  storyLine: lorem("line"),
-  // One sentence: what the reader gets by clicking. Be specific.
+  // PROMISE = the hyperlinked text readers see in the standard link block of every report
+  // (kickoff v3 §10, plan §3.2). One specific sentence on what the click gets them, e.g.
+  // "see the full debt summary" renders as "Short & Options Positioning: <promise>".
   promise: lorem("sentence"),
   summary: {
     // Own real content on the landing page. Never just a menu.
@@ -18,22 +18,27 @@ export default parent({
   },
   // ONE table or chart we already produce. Replace the placeholder rows or points.
   visual: chart("Short interest, recent months", ["M-5", "M-4", "M-3", "M-2", "M-1", "Latest"]),
-  // 3-5 children. Set live: false on a child to take it off the page (dormant).
+  // 3-5 children. Each child card shows its `headline` (the finding, up front) and its `promise`
+  // (the hyperlinked text). Set live: false on a child to take it off the page (dormant).
   children: [
     child("Short Interest", {
-      hint: "Trend over recent months.",
+      headlineHint: "Short interest as a percentage of float.",
+      unlocksHint: "Trend over recent months.",
       flags: ["check"],
     }),
     child("Short Crowding", {
-      hint: "Days-to-cover and borrow or squeeze-risk detail we already cover.",
+      headlineHint: "Signs of a crowded short (e.g., days to cover).",
+      unlocksHint: "Days-to-cover and borrow or squeeze-risk detail we already cover.",
       flags: ["check"],
     }),
     child("Options Activity", {
-      hint: "Specific strikes and expirations involved.",
+      headlineHint: "That options volume is unusual.",
+      unlocksHint: "Specific strikes and expirations involved.",
       flags: ["check"],
     }),
     child("Unusual Trading Volume", {
-      hint: "Historical volume pattern for comparison.",
+      headlineHint: "That trading volume is elevated.",
+      unlocksHint: "Historical volume pattern for comparison.",
       flags: ["watch"],
     }),
   ],

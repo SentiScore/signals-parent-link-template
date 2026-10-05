@@ -7,9 +7,9 @@ import { chart, child, lorem, parent, table } from "../helpers";
 export default parent({
   order: 5,
   title: "Insiders & Management",
-  // One short line in the standard link block of every story: "Insiders & Management: <storyLine>".
-  storyLine: lorem("line"),
-  // One sentence: what the reader gets by clicking. Be specific.
+  // PROMISE = the hyperlinked text readers see in the standard link block of every report
+  // (kickoff v3 §10, plan §3.2). One specific sentence on what the click gets them, e.g.
+  // "see the full debt summary" renders as "Insiders & Management: <promise>".
   promise: lorem("sentence"),
   summary: {
     // Own real content on the landing page. Never just a menu.
@@ -18,16 +18,20 @@ export default parent({
   },
   // ONE table or chart we already produce. Replace the placeholder rows or points.
   visual: table("Recent insider activity", ["Date", "Insider", "Action"]),
-  // 3-5 children. Set live: false on a child to take it off the page (dormant).
+  // 3-5 children. Each child card shows its `headline` (the finding, up front) and its `promise`
+  // (the hyperlinked text). Set live: false on a child to take it off the page (dormant).
   children: [
     child("Insider Buying & Selling", {
-      hint: "The insider transaction log.",
+      headlineHint: "Net direction of insider activity.",
+      unlocksHint: "The insider transaction log.",
     }),
     child("Executive & Director Stock Plans", {
-      hint: "Vesting schedules and strike prices.",
+      headlineHint: "New grants or exercises.",
+      unlocksHint: "Vesting schedules and strike prices.",
     }),
     child("Executive Changes", {
-      hint: "Background and compensation package.",
+      headlineHint: "Who changed roles.",
+      unlocksHint: "Background and compensation package.",
     }),
   ],
   // The quiet "visit Stock Dashboard" strip, shown below the child links.
