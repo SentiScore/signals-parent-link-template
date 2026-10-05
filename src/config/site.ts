@@ -2,9 +2,10 @@
  * Brand and behaviour settings. Everything a developer might retune lives here.
  */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://stockdashboard.com").replace(/\/$/, "");
-export const SITE_NAME = "Stock Dashboard";
-/** Shown next to the wordmark so readers know whose research this is. */
-export const RESEARCH_LABEL = "BST Research";
+/** Page branding: Greenwich Research News Data everywhere. */
+export const BRAND_NAME = "Greenwich Research News Data";
+/** Name of the crossover DESTINATION, used only in the optional-detour copy. */
+export const DESTINATION_NAME = "Stock Dashboard";
 
 /** Local review mode: pages render without a link token. Must be off in production. */
 export const PREVIEW = process.env.SIGNALS_PREVIEW === "1";
@@ -26,4 +27,10 @@ export const CROSSOVER = {
   eyebrow: "Optional detour",
   cta: "Explore {company} on Stock Dashboard",
   reassurance: "Free to explore. Your research above stays one click away.",
+};
+
+/** Standard story link block: heading and per-line suffix so the block carries the Greenwich brand. */
+export const STORY_BLOCK = {
+  heading: "Greenwich Research News Data: go deeper on {company}",
+  lineSuffix: " (Greenwich)",
 };

@@ -19,7 +19,7 @@ export function ParentLanding({ parent, companyName, ctx }: { parent: ParentCont
 
       <header className="flex items-center justify-between border-b border-line pb-4">
         <Brand />
-        {ctx.published && <span className="text-xs text-muted-2 tnum">From story · {ctx.published}</span>}
+        {ctx.published && <span className="text-xs text-muted-2 tnum">Greenwich · from story {ctx.published}</span>}
       </header>
 
       <main className="mt-8 space-y-8">

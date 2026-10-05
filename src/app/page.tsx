@@ -25,8 +25,9 @@ export default function Gallery() {
         ))}
       </ol>
       <h2 className="mt-8 text-xs font-semibold uppercase tracking-[0.14em] text-accent-2">Standard link block (shape)</h2>
-      <ul className="mt-3 space-y-1 text-sm">
-        {storyBlock(ctx).map((l) => (
+      <p className="mt-3 text-sm font-semibold">{storyBlock(ctx).heading}</p>
+      <ul className="mt-2 space-y-1 text-sm">
+        {storyBlock(ctx).items.map((l) => (
           <li key={l.href}><a className="underline underline-offset-4" href={l.href}>{l.title}</a>: {l.line}</li>
         ))}
       </ul>

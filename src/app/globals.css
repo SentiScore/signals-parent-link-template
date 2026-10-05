@@ -2,35 +2,20 @@
 
 /* StockDashboard design tokens (same values as the web app's theme). */
 :root {
-  --cream: #faf7f2;
-  --cream-2: #f4efe8;
+  /* Greenwich Research News Data palette (sampled from the logo): navy + green on white. */
+  --cream: #f6f8f7;
+  --cream-2: #eef2f0;
   --card: #ffffff;
-  --ink: #1a1613;
-  --ink-2: #2a2420;
-  --muted: #736759;
-  --muted-2: #9b8f80;
-  --border: #e9e2d6;
-  --border-strong: #d9d0bf;
-  --accent: #ed9c3a;
-  --accent-2: #e08a1f;
-  --accent-soft: #fcebd0;
-  --shadow-md: 0 6px 20px rgba(26, 22, 19, 0.07);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --cream: #0e1114;
-    --cream-2: #181c22;
-    --card: #15181d;
-    --ink: #f4ede3;
-    --ink-2: #e8decf;
-    --muted: #9b8f80;
-    --muted-2: #6e6458;
-    --border: #232832;
-    --border-strong: #2e343f;
-    --accent-2: #f5b25a;
-    --accent-soft: rgba(237, 156, 58, 0.18);
-    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.5);
-  }
+  --ink: #0e3848;
+  --ink-2: #1d4b5b;
+  --muted: #5b727a;
+  --muted-2: #82969c;
+  --border: #dde5e3;
+  --border-strong: #c5d2cf;
+  --accent: #286e4c;
+  --accent-2: #286e4c;
+  --accent-soft: #e1efe7;
+  --shadow-md: 0 6px 20px rgba(14, 56, 72, 0.09);
 }
 
 @theme inline {
@@ -56,7 +41,6 @@ body { background: var(--cream); color: var(--ink); font-family: var(--font-sans
 ::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); }
 
 .serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
-.wordmark { font-weight: 700; letter-spacing: 0.18em; font-size: 12px; text-transform: uppercase; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 /* Placeholder content (anything starting "Lorem ipsum") is outlined in preview so it is obvious what is unfilled. */

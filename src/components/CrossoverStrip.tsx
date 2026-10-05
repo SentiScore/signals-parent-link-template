@@ -1,4 +1,4 @@
-import { CROSSOVER, SITE_URL, crossoverUrl } from "@/config/site";
+import { CROSSOVER, DESTINATION_NAME, SITE_URL, crossoverUrl } from "@/config/site";
 import { fill } from "@/lib/content";
 import type { LinkContext } from "@/lib/context";
 import { TrackedLink } from "./TrackedLink";
@@ -10,10 +10,9 @@ import { TrackedLink } from "./TrackedLink";
  */
 export function CrossoverStrip({ parentId, hook, cta, company, ctx }: { parentId: string; hook: string; cta?: string; company: string; ctx: LinkContext }) {
   return (
-    <aside aria-label="Stock Dashboard" className="rounded-2xl border border-dashed border-line-strong bg-cream-2 px-5 py-4">
+    <aside aria-label={DESTINATION_NAME} className="rounded-2xl border border-dashed border-line-strong bg-cream-2 px-5 py-4">
       <div className="flex items-start gap-3.5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/stockdashboard-logo.png" alt="" width={32} height={32} className="mt-0.5 rounded-lg opacity-90" />
+        <span aria-hidden className="mt-1 h-10 w-1 shrink-0 rounded-full bg-accent/50" />
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-2">{CROSSOVER.eyebrow}</p>
           <p className="serif mt-1 text-lg leading-snug text-ink-2">{fill(hook, company)}</p>
