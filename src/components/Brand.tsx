@@ -7,6 +7,6 @@ import { BRAND_NAME } from "@/config/site";
 export function Brand() {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src="/brand/greenwich-logo.png" alt={BRAND_NAME} width={150} height={70} className="h-14 w-auto mix-blend-multiply" />
+    <img src="/brand/greenwich-logo.png" alt={BRAND_NAME} width={150} height={60} className="h-12 w-auto" />
   );
 }

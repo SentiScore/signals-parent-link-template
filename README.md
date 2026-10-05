@@ -91,6 +91,12 @@ then check GA4 DebugView and a row in BST-DB per event type.
 
 ---
 
+## Pages are static per company, never per story or report type
+
+The same 15 links are reused across products, so the page body must be identical whichever report or story the reader came from.
+Nothing on the page is derived from the story, report type, platform or publish date. Those values (`story`, `platform`, `placement`, `published`)
+are carried in the URL **for tracking only** (kickoff §9) and are never rendered. Content varies only by company (optional overrides). Keep it that way.
+
 ## Page structure (same for all 15 parents)
 
 Kickoff v3 §3.4 / §3.5: **promise → summary with real figures → one table or chart → 3-5 child links → quiet optional-detour strip.**

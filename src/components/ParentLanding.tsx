@@ -17,9 +17,8 @@ export function ParentLanding({ parent, companyName, ctx }: { parent: ParentCont
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6">
       <ParentOpenTracker event={{ event: "parent_open", company: ctx.company, parent: parent.id, placement: ctx.placement, story: ctx.story, published: ctx.published, platform: ctx.platform }} />
 
-      <header className="flex items-center justify-between border-b border-line pb-4">
+      <header className="border-b border-line pb-4">
         <Brand />
-        {ctx.published && <span className="text-xs text-muted-2 tnum">Greenwich · from story {ctx.published}</span>}
       </header>
 
       <main className="mt-8 space-y-8">
