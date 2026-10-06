@@ -1,15 +1,16 @@
 "use client";
+
 /**
- * Hit capture for the three events in the plan's unified schema (Appendix B):
- * parent_open, child_open, crossover_home. Every event is sent to BOTH sinks:
- *   1. GA4   - window.gtag, enabled by NEXT_PUBLIC_GA_ID
- *   2. BST-DB - POST to NEXT_PUBLIC_EVENTS_ENDPOINT (sendBeacon)
- * Each parent is tracked individually through the `parent_topic` parameter (and `child_topic`
- * for child clicks), so all 15 parents are separable in both places.
+ * Readership Attention Signal tracking.
  *
- * TODO(dev): confirm the BST-DB endpoint and payload contract; register the GA4 custom
- * dimensions listed in the README.
+ * Events are sent to:
+ *   1. GA4, when NEXT_PUBLIC_GA_ID is configured.
+ *   2. NEXT_PUBLIC_EVENTS_ENDPOINT using sendBeacon.
+ *
+ * A browser-session identifier is generated and stored in sessionStorage.
+ * It survives navigation within the same tab/session but is not PII.
  */
+
 export type SignalEvent = {
   event: "parent_open" | "child_open" | "crossover_home";
   company: string;
@@ -21,15 +22,55 @@ export type SignalEvent = {
   platform?: string;
 };
 
+type SignalPayload = SignalEvent & {
+  ts: string;
+  session_id: string;
+};
+
 declare global {
-  interface Window { gtag?: (...args: unknown[]) => void }
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
+const SESSION_KEY = "signals_session_id";
+
+function getSessionId(): string {
+  if (typeof window === "undefined") {
+    return "server";
+  }
+
+  try {
+    const existing = window.sessionStorage.getItem(SESSION_KEY);
+
+    if (existing) {
+      return existing;
+    }
+
+    const id = crypto.randomUUID();
+
+    window.sessionStorage.setItem(SESSION_KEY, id);
+
+    return id;
+  } catch {
+    // Fallback for environments where sessionStorage is unavailable.
+    return crypto.randomUUID();
+  }
 }
 
 export function track(e: SignalEvent) {
-  const payload = { ...e, ts: new Date().toISOString() };
+  if (typeof window === "undefined") return;
 
-  // GA4: flat snake_case params, one event name per type.
-  if (typeof window !== "undefined" && window.gtag) {
+  const sessionId = getSessionId();
+
+  const payload: SignalPayload = {
+    ...e,
+    ts: new Date().toISOString(),
+    session_id: sessionId,
+  };
+
+  // GA4
+  if (window.gtag) {
     window.gtag("event", e.event, {
       parent_topic: e.parent,
       child_topic: e.child,
@@ -38,14 +79,22 @@ export function track(e: SignalEvent) {
       story_id: e.story,
       story_published: e.published,
       platform: e.platform,
+      session_id: sessionId,
       transport_type: "beacon",
     });
   }
 
-  // BST-DB
+  // Event collector / future BST-DB endpoint
   const url = process.env.NEXT_PUBLIC_EVENTS_ENDPOINT;
-  if (url && typeof navigator !== "undefined" && navigator.sendBeacon) {
-    navigator.sendBeacon(url, new Blob([JSON.stringify(payload)], { type: "application/json" }));
+
+  if (url && navigator.sendBeacon) {
+    navigator.sendBeacon(
+      url,
+      new Blob(
+        [JSON.stringify(payload)],
+        { type: "application/json" }
+      )
+    );
   } else if (process.env.NODE_ENV !== "production") {
     console.debug("[signals]", payload);
   }
