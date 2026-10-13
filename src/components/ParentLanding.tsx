@@ -17,8 +17,18 @@ export function ParentLanding({ parent, companyName, ctx }: { parent: ParentCont
   const hasPeers = !!parent.peerLinks?.length;
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6">
-      <ParentOpenTracker event={{ event: "parent_open", company: ctx.company, parent: parent.id, placement: ctx.placement, story: ctx.story, published: ctx.published, platform: ctx.platform }} />
-
+<ParentOpenTracker
+  event={{
+    event: "parent_open",
+    token: ctx.token,
+    company: ctx.company,
+    parent: parent.id,
+    placement: ctx.placement,
+    story: ctx.story,
+    published: ctx.published,
+    platform: ctx.platform,
+  }}
+/>
       <header className="border-b border-line pb-4">
         <Brand />
       </header>

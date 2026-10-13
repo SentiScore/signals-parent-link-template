@@ -12,7 +12,13 @@
  */
 
 export type SignalEvent = {
-  event: "parent_open" | "child_open" | "crossover_home";
+  event:
+    | "parent_open"
+    | "child_click"
+    | "child_open"
+    | "crossover_home";
+
+  token?: string;
   company: string;
   parent: string;
   child?: string;

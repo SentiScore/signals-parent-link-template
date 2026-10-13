@@ -1,4 +1,4 @@
-import { CROSSOVER, DESTINATION_NAME, SITE_URL, crossoverUrl } from "@/config/site";
+﻿import { CROSSOVER, DESTINATION_NAME, SITE_URL, crossoverUrl } from "@/config/site";
 import { fill } from "@/lib/content";
 import type { LinkContext } from "@/lib/context";
 import { TrackedLink } from "./TrackedLink";
@@ -20,10 +20,10 @@ export function CrossoverStrip({ parentId, hook, cta, company, ctx }: { parentId
             <TrackedLink
               href={crossoverUrl(parentId)}
               external
-              event={{ event: "crossover_home", company: ctx.company, parent: parentId, placement: ctx.placement, story: ctx.story, published: ctx.published, platform: ctx.platform }}
+              event={{ event: "crossover_home", token: ctx.token, company: ctx.company, parent: parentId, placement: ctx.placement, story: ctx.story, published: ctx.published, platform: ctx.platform }}
               className="font-medium text-accent-2 underline decoration-accent/40 underline-offset-4 hover:decoration-accent"
             >
-              {fill(cta ?? CROSSOVER.cta, company)} <span aria-hidden>↗</span>
+              {fill(cta ?? CROSSOVER.cta, company)} <span aria-hidden>â†—</span>
             </TrackedLink>
             <span className="ml-2 text-muted-2">{new URL(SITE_URL).host}</span>
           </p>
@@ -33,3 +33,4 @@ export function CrossoverStrip({ parentId, hook, cta, company, ctx }: { parentId
     </aside>
   );
 }
+

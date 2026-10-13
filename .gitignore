@@ -4,3 +4,6 @@ node_modules
 .env
 *.tsbuildinfo
 next-env.d.ts
+
+# Local readership link registry
+/data/tracked-links.json
