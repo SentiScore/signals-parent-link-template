@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {GA_ID && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-            {/* send_page_view off: we send explicit parent_open / child_open / crossover_home events instead. */}
+            {/* send_page_view off: components/analytics.tsx sends explicit parent_open and sd_click events instead. */}
             <Script id="ga4-init" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}',{send_page_view:false,allow_google_signals:false,page_location:location.origin+location.pathname});`}</Script>
           </>
         )}

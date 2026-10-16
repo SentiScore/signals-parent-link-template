@@ -1,148 +1,127 @@
-# Signals parent-link template (Greenwich Research News Data)
+# Readership Signals: parent page templates
 
-One reusable **parent landing page** template for all **15 parent links** of the Readership Attention Signal
-(Kickoff v3 and the Consolidated Signal Platform plan, Appendix A). Every page is branded
-**Greenwich Research News Data**. All copy, figures, tables and links are **lorem ipsum placeholders**.
-The structure is the deliverable; the analyst team will supply the real content.
+The parent pages behind the tracked links in BST reports, branded **Greenwich Research News Data**.
+This repo holds the five category templates signed off so far, the link format, and hit capture.
 
-Stack matches `stock-dashboard-web-app` (Next 16, React 19, Tailwind v4) so it can be hosted there or
-alongside it. This repo is standalone and does not modify the StockDashboard repo.
+| Code | Category | Layout family | Exhibit |
+|---|---|---|---|
+| C01 | Revenue mix | Standard (workbook "Example page") | 8-quarter table |
+| C02 | Margins and what moves them | Exhibit first | Line chart, three series, spread shaded |
+| C05 | Capex and committed spend | Two exhibits, two as-of dates | Capex table, then commitments bar |
+| C07 | Legal and regulatory docket | List, no figures strip | Matter register |
+| C10 | Peer ranking and rotation | Comparison, exhibit-led | Ranking matrix plus tracked peer links |
+
+Sources of truth: *Readership Signals: Live Project Document* (13 Oct 2026), *Parent Page Templates*
+(Kartik, 15 Oct 2026) and the v2 workbook (*Core topics*, *Apple v2*, *Example page* tabs).
+**All company-specific content is lorem ipsum.** Every place real content goes is a typed field in
+`src/content/types.ts`.
 
 ```bash
 npm install
-cp .env.example .env.local          # SIGNALS_PREVIEW=1 for local review
-npm run dev                         # http://localhost:3300  (gallery of all 15 parents)
-npm run check:content               # structure errors + placeholders left, per parent
-npm run check:content -- --strict   # also fail on unfilled placeholders (use as a pre-go-live gate)
+cp .env.example .env.local     # SIGNALS_PREVIEW=1 for local review
+npm run dev                    # http://localhost:3300  gallery of every template, with working links
+npm run check:all              # typecheck + content rules + link round-trip and 2,90,400-link volume test
 ```
 
 ---
 
-## Suryansh: what you need to do, end to end
+## How it works, end to end
 
-Three jobs. Everything else is already built.
+```
+report issue ──► link block: one link per live topic, text = the promise line
+                    │   /{quarter}/{token}            token = signed link context, nothing stored
+                    ▼
+proxy.ts          verify token (one HMAC). Invalid or other quarter ──► 307 to stockdashboard.com
+                    ▼
+[quarter]/[token] decode context ─► getPage(company, code)  (cached per company, "use cache")
+                    │                       └── content source: lorem today, BST DB via pillar 1
+                    ├─► render the category template (S12-S15 use their cluster's template)
+                    └─► after(): recordHit(kind "page")  ──► HITS_ENDPOINT (BST-DB) or local log
+                    
+page links:       StockDashboard section ─► /{quarter}/{token}/sd ─► recordHit(kind "sd") ─► 302 out
+                  C10 peers ─► new token for the peer's C10, placement "peer_rotation", ref = this company
+GA4 mirror:       parent_open and sd_click, client-side, same context (optional)
+```
 
-### Job 1. Replace the placeholder content (when analysts deliver)
-
-One file per parent: `src/content/parents/NN-<parent>.ts` (15 files). Each holds the same fields, so the work is identical 15 times:
-
-| Field | What the analysts provide |
-|---|---|
-| `promise` | **The hyperlinked text readers see in the report's link block** ("Debt & Refinancing: *see the full debt summary*"). One specific sentence on what the click gets them |
-| `summary.metrics[]` | Headline figures (labels are already set; replace the `value`s) |
-| `summary.body` | 2-3 sentence summary. Must carry real content |
-| `visual` | The ONE table or chart we already produce (`table()` / `chart()` helpers) |
-| `children[].headline` | The headline finding shown up front on the child card (kickoff §5 "Headline shown") |
-| `children[].promise` | **The hyperlinked text on the child card**: what that click unlocks |
-| `crossover.hook` | Optional-detour copy for the strip (a draft is already written) |
-
-Rules from the kickoff doc, enforced by `npm run check:content`: 1-5 live children per parent, no duplicate ids.
-Child `headlineHint` and `unlocksHint` fields hold the kickoff §5 "Headline shown" and "Detail unlocked" text as analyst reference (never rendered).
-Child `flags` (`check`, `watch`) are the kickoff review statuses and print in the check output.
-
-Content differs per company? Add `src/content/companies/<company>.ts` (copy `example.ts`) and register it in `companies/index.ts`.
-It deep-merges over the parent defaults (objects merge, arrays such as metrics and table rows are replaced whole, children match by `id`).
-The sector KPI child (Business Performance) is a per-company title override, shown in `example.ts`.
-
-Dormant rule: if analysts can't fill a link, set `live: false` on that child or parent. It disappears from the page and the story block.
-**Set an explicit `id` before renaming any live parent or child**, otherwise the logged topic id changes and breaks the time series.
-
-### Job 2. Attach child links to their parent
-
-Every child already sits under its correct parent in the parent file (structure per Kickoff v3 §4/§5). Each child resolves to:
-
-- the built-in route `/signals/<parent-slug>/<child-slug>` by default (currently a **stub** page, see below), or
-- any destination you set with `href` on that child (child page, or an external or internal URL once the child template/content exists).
-
-Whatever the destination, `withContext()` (`src/lib/context.ts`) appends the parent's context so the child click traces back
-to where the reader started: `t` (token), `company`, `story`, `platform`, `placement`, `published`. Do not bypass it.
-Build the real child page template at `src/app/signals/[parent]/[child]/page.tsx` (replace the stub body) and read the context from `searchParams`.
-
-### Job 3. Hit capture on all 15 parents, tracked individually in GA4 and BST-DB
-
-`src/lib/track.ts` already defines and fires three events from the shared components, so **all 15 parents are instrumented by the one template**.
-Nothing to copy per parent. What you must wire:
-
-| Event | Fires when | Component |
-|---|---|---|
-| `parent_open` | landing page renders | `ParentOpenTracker` |
-| `child_open` | a child link is clicked | `ChildLinks` |
-| `crossover_home` | the optional Stock Dashboard link is clicked | `CrossoverStrip` |
-
-Each event is sent to **both** sinks:
-
-1. **GA4.** Set `NEXT_PUBLIC_GA_ID`. Page views are off by design; GA receives only the three events with params
-   `parent_topic`, `child_topic`, `company`, `placement`, `story_id`, `story_published`, `platform`.
-   Each parent is separable by `parent_topic` (15 values, e.g. `debt_refinancing`) and each child by `child_topic`.
-   Register these as **event-scoped custom dimensions** in GA4 Admin, otherwise they won't appear in reports.
-2. **BST-DB.** Set `NEXT_PUBLIC_EVENTS_ENDPOINT`. Events are `POST`ed as JSON (`sendBeacon`) with `event, company, parent, child, placement, story, published, platform, ts`
-   (matches Appendix B of the plan). Confirm the final contract with the BST-DB owner. Bot flag, suspect flag, session id and
-   event-window tag are **server-side** per the kickoff doc §9, add them at ingestion.
-
-Verify: open each of the 15 pages from the gallery with the dev console open (events log as `[signals]` when no endpoint is set),
-then check GA4 DebugView and a row in BST-DB per event type.
-
-### Also needed before production (all small, all marked `TODO(dev)`)
-
-1. **Token verification**: `hasValidToken` in `src/lib/context.ts`. Today any token passes. No valid token must redirect to the public site (already coded).
-2. **Link minting**: a new link per story, topic, company, platform and placement (kickoff §9). `src/lib/story-block.ts` builds the block the report templates consume: a Greenwich-branded heading, then one line per live parent in fixed order, "<title>: <promise>" with the promise as the hyperlink (`storyBlock()` for data, `storyBlockHtml()` for an HTML snippet). The gallery page renders it.
-3. **Redeploy with `SIGNALS_PREVIEW` unset** (it bypasses the token and enables the gallery). Never set it in production.
-4. Footer disclaimer and last-refreshed date text (`ParentLanding.tsx`).
+**Why it scales.** Link volume (66 issues × 50 companies × 11-15 topics × 2 platforms × 4 products ≈ 2,90,400+
+links per quarter, about double with StockDashboard links) costs nothing: a link is its own signed context, so
+there is no link table to write, store, index or look up. Serving a link is one HMAC plus a cached content read.
+Pages are cached per company and topic, not per link, so the content store sees one read per page per refresh,
+whatever the link count. `npm run check:tracking` mints and verifies a full quarter in about a second, with
+**0 bytes stored**, which is also the answer to the "testing 2 lakh+ links locally" roadblock.
 
 ---
 
-## Pages are static per company, never per story or report type
+## Suryansh: what to build next
 
-The same 15 links are reused across products, so the page body must be identical whichever report or story the reader came from.
-Nothing on the page is derived from the story, report type, platform or publish date. Those values (`story`, `platform`, `placement`, `published`)
-are carried in the URL **for tracking only** (kickoff §9) and are never rendered. Content varies only by company (optional overrides). Keep it that way.
+### 1. Content ingestion (pillar 1)
+- Implement `ContentSource` (`src/content/source.ts`) against the BST database and export it as `source`
+  in place of `loremSource`. Nothing else changes.
+- The agent fills exactly the fields in `src/content/types.ts`. Titles, column headers, metric lists, due-period
+  buckets and refresh triggers are fixed in the templates and `src/content/taxonomy.ts`, so the agent cannot
+  change a page's shape.
+- Company records (`Company`) list each company's live links in slot order. S12-S15 links name the core
+  template they reuse; it must be a template from the S link's cluster (for example S12 Greater China revenue →
+  `C01`, Operating performance). A topic with no content is simply left out (dormant).
+- After writing a company, call `POST /api/revalidate` `{ "company": "<id>" }` with header
+  `x-revalidate-secret: $REVALIDATE_SECRET`. Links are unaffected.
+- Run `npm run check:content` before content goes live: 3-5 bullets under 25 words, 40-80 words in How to read it,
+  3-5 figures, 8 quarters, 7 peers, slot order, valid source references, and so on.
 
-## Page structure (same for all 15 parents)
+### 2. Dynamic links (pillars 2 and 3)
+- Mint with `mintToken` / `pagePath` in `src/lib/links.ts`. Context: `quarter`, `product`
+  (`dsr`, `mini_dsr`, `day_ahead_dsr`, `peer_story`), `issue`, `company`, `code`, `platform`
+  (`lexisnexis`, `lseg`), `placement` (`block`, `in_text`; `peer_rotation` is minted by C10 itself).
+- A new issue = a new `issue` value = a new URL, even with unchanged content.
+- Quarter rollover = a new `quarter` path segment and a new derived signing key. Old links keep working forever
+  under their own quarter.
+- Set `LINK_SECRET` (long random string) in production and never rotate it: changing it invalidates every
+  published link.
+- The link text is the page's `promise`, word for word (templates doc: "the promise line is the label").
 
-Kickoff v3 §3.4 / §3.5: **summary with real figures → one table or chart → 3-5 child links → quiet optional-detour strip.**
+### 3. Hit capture into BST-DB (pillar 2)
+- Every page open and StockDashboard click is recorded server-side by `recordHit` (`src/lib/hits.ts`), after the
+  response, so it never slows the page and works without JavaScript. Set `HITS_ENDPOINT` to the BST-DB ingestion
+  URL; each hit is one JSON POST:
+  `kind, quarter, product, issue, company, code, template, cluster, platform, placement, ref, weeksSinceChange, userAgent, at`.
+- That is enough for every view the doc asks for: per product, quarter, company and category, plus per issue
+  and placement.
+- Bot filtering and the suspect flag belong downstream at ingestion (kickoff §9); the user agent is passed
+  through for that. No IP or personal data is recorded.
+- Without `HITS_ENDPOINT`, hits are kept in memory (last 10,000) and shown at `GET /api/hits` in preview mode.
+  This replaces the earlier `/api/events` test collector.
+- GA4 (optional): set `NEXT_PUBLIC_GA_ID`. Register `company, topic_code, template, cluster, product, platform,
+  placement, issue, quarter, session_id` as event-scoped custom dimensions.
 
-### What "promise" means (kickoff v3 §10, plan §3.2)
-A promise is the **clickable text a reader sees before deciding to click**: "what the reader gets by clicking".
-"See the year-by-year maturity schedule" gets clicks; "Learn more about debt" doesn't.
-- **Parent promise** = the hyperlinked text in the report's standard link block. It is *not* repeated on the landing page; the landing page summary is what fulfils it.
-- **Child promise** = the hyperlinked text on each child card, under the child's **headline finding** (shown up front; the detail stays behind the click, per the value-gate rule §2.2).
-Branding is Greenwich Research News Data (logo header, green and navy palette sampled from the logo). Colours are tokens in `src/app/globals.css`;
-logo is `public/brand/greenwich-logo.png`; brand strings are in `src/config/site.ts`.
+### 4. Publishing pipeline (pillar 4)
+- The pipeline mints one link per topic per issue with the context above and places the block in the report.
+  The gallery (`src/app/page.tsx`) shows the block for each placeholder company as a working reference.
+- Test on sample logic first: `npm run check:tracking` is the harness. Extend it with the pipeline's own issue IDs.
 
-### The Stock Dashboard strip (does not pull readers away from child links)
-- The header logo is **not a link**. The only exit is the strip.
-- The strip sits **below** the child links, in small muted type, as a text link (not a button), opens in a **new tab**, and says "Optional detour" and "Free to explore".
-- Hook copy is per parent (`crossover.hook`, `{company}` is substituted). Shared wording: `CROSSOVER` in `src/config/site.ts`.
-- The link carries UTM params only, never the token, and uses `noopener noreferrer` so the hidden URL is not leaked as a referrer.
+---
 
-## Not discoverable, not indexable
+## Adding the remaining templates (C03, C04, C06, C08, C09, C11)
+1. Add the category to `CATEGORIES` and `TEMPLATE_CODES` in `src/content/taxonomy.ts`.
+2. Add its content type to `src/content/types.ts` (only company-specific fields).
+3. Add `src/templates/Cxx.tsx` from the shared blocks in `src/components/blocks.tsx`, in the layout family's
+   block order, and a case in `src/templates/index.tsx`.
+4. Add lorem content in `src/content/lorem.ts` and its rules in `scripts/check-content.mts`.
 
-These pages must be reachable only by readers who click a tracked link inside a Greenwich story or report on AlphaSense, LexisNexis, LSEG etc.
+## Rules the code enforces (templates doc, "The rules that do not bend")
+- Same six blocks on every page; the order is fixed per layout family.
+- A figure without a value is left out and the gap is stated in one line under the exhibit, never an "n/a".
+  A table row with no data is dropped the same way.
+- C05 has no single page-level as-of date; each exhibit carries its own in its heading.
+- C07 is headed "confirmed to"; a next-known date that has passed is hidden automatically. Counts in the title
+  block are derived from the register.
+- C10: each row carries its own period, the peer median is a table row, and a metric reported by fewer than four
+  peers is dropped. It is the only template with links out (tracked rotation).
+- Every parent page carries the StockDashboard section, below the six blocks, with its own tracked link that
+  opens in a new tab and passes UTM tags only.
 
-| Layer | Where |
-|---|---|
-| `robots.txt`: `Disallow: /` for all agents, plus named search and AI crawlers | `src/app/robots.ts` |
-| `<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">` | `src/app/layout.tsx` |
-| `X-Robots-Tag` response header on every route | `next.config.ts` |
-| No sitemap, no navigation, no internal links to these pages; gallery returns 404 outside preview | by design |
-| `referrer: same-origin` so URLs don't leak to other sites | `src/app/layout.tsx` |
-| **Token gate**: no valid token redirects to the public site | `src/lib/context.ts` (**you finish this**) |
-
-Note: `robots.txt` is a request, and a crawler that obeys it never sees the `noindex` tag, while a URL pasted publicly can still be listed as a bare link.
-The token gate is the real protection, so make tokens unguessable and don't paste live URLs anywhere public.
-
-## Quick reference: "I want to…"
-
-| Task | Edit |
-|---|---|
-| Write a parent's promise (report link text), summary, table or chart | `src/content/parents/NN-<parent>.ts` |
-| Write a child's headline finding, promise (link text) or destination | the `child(...)` entry (`headline`, `promise`, `href`) |
-| Take a child or parent offline | `live: false` |
-| Run with fewer than 15 parents | `live: false` on the parent |
-| Company-specific content | `src/content/companies/` |
-| Brand name, crossover URL and copy, story-block wording | `src/config/site.ts` |
-
-Placeholders are any text starting `Lorem ipsum`. In preview mode they get a dashed outline so unfilled spots are obvious.
-
-## Source of structure
-Parents, children, order and hints come from Readership Attention Signal Kickoff v3 (§4, §5) and are subject to analyst review.
+## Not discoverable
+- `robots.txt` disallows everything.
+- `noindex` meta and `X-Robots-Tag` on every response.
+- No sitemap, and no links into these pages anywhere.
+- Gallery and hit viewer exist only with `SIGNALS_PREVIEW=1`.
+- Every link URL is gated by `proxy.ts`: no valid signed token means a redirect to the public site.
