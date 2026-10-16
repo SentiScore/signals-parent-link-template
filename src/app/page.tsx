@@ -1,45 +1,81 @@
 import { notFound } from "next/navigation";
-import { PREVIEW } from "@/config/site";
-import { getCompany, liveParents } from "@/lib/content";
-import { withContext } from "@/lib/context";
-import { storyBlock } from "@/lib/story-block";
+import { connection } from "next/server";
+import { Suspense } from "react";
+import { Brand } from "@/components/Brand";
+import { BRAND_NAME, PREVIEW } from "@/config/site";
+import { CATEGORIES } from "@/content/taxonomy";
+import { getPage, listCompanies } from "@/lib/data";
+import { pagePath, quarterOf, type LinkContext } from "@/lib/links";
 
-/** Dev-only gallery of all parents so every page can be reviewed. Disabled outside preview. */
+/**
+ * Preview gallery (SIGNALS_PREVIEW=1 only). Shows each placeholder company's standard link block as a
+ * report would carry it, with freshly minted links, so every template can be opened and reviewed.
+ */
 export default function Gallery() {
   if (!PREVIEW) notFound();
-  const ctx = { company: "example-co", platform: "nexis", story: "demo-story-1", published: "2026-10-05", placement: "standard_block" as const };
-  const parents = liveParents();
-  const block = storyBlock(ctx);
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="serif text-4xl">Parent link template</h1>
-      <p className="mt-2 text-muted">Preview gallery for {getCompany(ctx.company).name}. {parents.length} live parents. Not available in production.</p>
-      <h2 className="mt-8 text-xs font-semibold uppercase tracking-[0.14em] text-accent-2">Landing pages</h2>
-      <ol className="mt-3 divide-y divide-line rounded-2xl border border-line bg-card">
-        {parents.map((p) => (
-          <li key={p.id}>
-            <a className="flex items-center justify-between px-5 py-3 hover:bg-cream-2" href={withContext(`/signals/${p.slug}`, ctx)}>
-              <span><span className="tnum mr-3 text-muted-2">{String(p.order).padStart(2, "0")}</span>{p.title}</span>
-              <span className="text-xs text-muted">{p.children.filter((c) => c.live).length} children →</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-      <h2 className="mt-10 text-xs font-semibold uppercase tracking-[0.14em] text-accent-2">How the parent links appear inside a report</h2>
-      <p className="mt-1 text-sm text-muted">The standard link block. The hyperlinked text is each parent&apos;s promise; that is what readers decide to click on.</p>
-      <div className="mt-3 rounded-2xl border border-line bg-card p-5 sm:p-6">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/greenwich-logo.png" alt="Greenwich Research News Data" width={110} height={44} className="h-9 w-auto" />
-        <p className="mt-3 text-sm font-semibold">{block.heading}</p>
-        <ul className="mt-2 space-y-1.5 text-sm leading-relaxed">
-          {block.items.map((l) => (
-            <li key={l.href}>
-              <span className="font-semibold">{l.title}:</span>{" "}
-              <a className="text-accent-2 underline decoration-accent/40 underline-offset-4 hover:decoration-accent" href={l.href}>{l.promise}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <Brand />
+      <h1 className="serif mt-6 text-4xl">Parent page templates</h1>
+      <p className="mt-2 max-w-2xl text-sm text-muted">
+        C01, C02, C05, C07 and C10, with two company-specific links (S12, S13) showing how an S link reuses its
+        cluster&apos;s template. All company content is lorem ipsum. Links below are minted for a preview issue
+        of the DSR on LexisNexis; each one opens and records a hit (see <a className="underline" href="/api/hits">/api/hits</a>).
+      </p>
+      <Suspense>
+        <Blocks />
+      </Suspense>
+    </div>
+  );
+}
+
+async function Blocks() {
+  await connection();
+  const quarter = quarterOf(new Date());
+  const companies = await listCompanies();
+  return (
+    <div className="mt-8 space-y-6">
+      {await Promise.all(
+        companies.map(async (c) => {
+          const items = await Promise.all(
+            c.links.map(async (l) => {
+              const ctx: LinkContext = {
+                quarter,
+                product: "dsr",
+                issue: "preview",
+                company: c.id,
+                code: l.code,
+                platform: "lexisnexis",
+                placement: "block",
+              };
+              return { ...l, promise: (await getPage(c.id, l.code))?.promise ?? "", href: pagePath(ctx) };
+            }),
+          );
+          return (
+            <section key={c.id} className="rounded-xl border border-line bg-card p-5">
+              <p className="text-sm font-semibold">
+                {BRAND_NAME}: go deeper on {c.name}
+              </p>
+              <ul className="mt-3 space-y-1.5 text-sm">
+                {items.map((i) => (
+                  <li key={i.code} className="grid grid-cols-[3.25rem_1fr] gap-2">
+                    <span className="tnum text-xs leading-6 text-muted-2">{i.code}</span>
+                    <span>
+                      <a className="text-accent-2 underline decoration-accent/40 underline-offset-4 hover:decoration-accent" href={i.href}>
+                        {i.promise}
+                      </a>
+                      <span className="ml-2 text-xs text-muted-2">
+                        {CATEGORIES[i.template].title}
+                        {i.code !== i.template && ` template (${CATEGORIES[i.template].cluster})`}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        }),
+      )}
     </div>
   );
 }

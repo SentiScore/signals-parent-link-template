@@ -2,7 +2,7 @@ import { BRAND_NAME } from "@/config/site";
 
 /**
  * Header brand lockup (Greenwich Research News Data). Deliberately NOT a link: the only way out
- * to stockdashboard.com is the quiet crossover strip below the child links.
+ * to stockdashboard.com is the StockDashboard section at the foot of the page.
  */
 export function Brand() {
   return (

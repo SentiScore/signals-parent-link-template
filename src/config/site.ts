@@ -1,38 +1,17 @@
-/**
- * Brand and behaviour settings. Everything a developer might retune lives here.
- */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://stockdashboard.com").replace(/\/$/, "");
-/** Page branding: Greenwich Research News Data everywhere. */
+/** Brand, destination and runtime switches. Everything an operator might retune lives here. */
+
 export const BRAND_NAME = "Greenwich Research News Data";
-/** Name of the crossover DESTINATION, used only in the optional-detour copy. */
-export const DESTINATION_NAME = "Stock Dashboard";
 
-/** Local review mode: pages render without a link token. Must be off in production. */
-export const PREVIEW = process.env.SIGNALS_PREVIEW === "1";
+/** The StockDashboard section on every parent page links here (tracked, see app/[quarter]/[token]/sd). */
+export const SD_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://stockdashboard.com").replace(/\/$/, "");
 
-/** Kickoff v3 §3.5: keep child links to about 3-5 per parent. */
-export const MAX_CHILDREN = 5;
-
-/** Crossover (StockDashboard home) link. Tagged so the crossover click can be measured. */
-export function crossoverUrl(parentId: string): string {
-  const u = new URL(SITE_URL);
-  u.searchParams.set("utm_source", "signals");
-  u.searchParams.set("utm_medium", "parent_page");
-  u.searchParams.set("utm_campaign", parentId);
-  return u.toString();
-}
-
-/** Copy for the crossover strip. {company} is replaced at render time. */
-export const CROSSOVER = {
+/** Copy for the StockDashboard section. {company} is replaced at render time. */
+export const SD_COPY = {
   eyebrow: "Optional detour",
+  hook: "Want the retail investor's view of {company}?",
   cta: "Explore {company} on Stock Dashboard",
-  reassurance: "Free to explore. Your research above stays one click away.",
+  reassurance: "Free to explore. Opens in a new tab, so this page stays where it is.",
 };
 
-/**
- * Standard link block in every report: a Greenwich-branded heading, then one line per live parent,
- * "<title>: <promise>", where the promise is the hyperlinked text.
- */
-export const STORY_BLOCK = {
-  heading: "Greenwich Research News Data: go deeper on {company}",
-};
+/** Local review: enables the gallery at / and the in-memory hit log. NEVER set in production. */
+export const PREVIEW = process.env.SIGNALS_PREVIEW === "1";

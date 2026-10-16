@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start -p 3300",
     "typecheck": "tsc --noEmit",
-    "check:content": "tsx scripts/check-content.ts",
-    "check:tracking": "tsx scripts/check-tracking.ts",
+    "check:content": "tsx scripts/check-content.mts",
+    "check:tracking": "tsx scripts/check-tracking.mts",
     "check:all": "npm run typecheck && npm run check:content && npm run check:tracking"
   },
   "dependencies": {
