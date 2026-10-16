@@ -1,4 +1,4 @@
-# Readership Signals: parent page templates
+# Readership Signals: parent page templates (Live)
 
 The parent pages behind the tracked links in BST reports, branded **Greenwich Research News Data**.
 This repo holds the five category templates signed off so far, the link format, and hit capture.
