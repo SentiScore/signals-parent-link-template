@@ -21,10 +21,3 @@ export async function getPage(companyId: string, code: TopicCode) {
   cacheLife("days");
   return source.getPage(companyId, code);
 }
-
-export async function listCompanies() {
-  "use cache";
-  cacheTag("companies");
-  cacheLife("days");
-  return source.listCompanies();
-}
