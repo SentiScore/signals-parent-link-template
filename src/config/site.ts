@@ -13,5 +13,5 @@ export const SD_COPY = {
   reassurance: "Free to explore. Opens in a new tab, so this page stays where it is.",
 };
 
-/** Local review: enables the gallery at / and the in-memory hit log. NEVER set in production. */
+/** Local review: enables the template menu at / and the in-memory hit log. NEVER set in production. */
 export const PREVIEW = process.env.SIGNALS_PREVIEW === "1";

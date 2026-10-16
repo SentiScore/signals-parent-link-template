@@ -19,7 +19,7 @@ Sources of truth: *Readership Signals: Live Project Document* (13 Oct 2026), *Pa
 ```bash
 npm install
 cp .env.example .env.local     # SIGNALS_PREVIEW=1 for local review
-npm run dev                    # http://localhost:3300  gallery of every template, with working links
+npm run dev                    # http://localhost:3300  menu with a working link to each template
 npm run check:all              # typecheck + content rules + link round-trip and 2,90,400-link volume test
 ```
 
@@ -95,7 +95,7 @@ whatever the link count. `npm run check:tracking` mints and verifies a full quar
 
 ### 4. Publishing pipeline (pillar 4)
 - The pipeline mints one link per topic per issue with the context above and places the block in the report.
-  The gallery (`src/app/page.tsx`) shows the block for each placeholder company as a working reference.
+  The preview menu (`src/app/page.tsx`) is a minimal working example of minting.
 - Test on sample logic first: `npm run check:tracking` is the harness. Extend it with the pipeline's own issue IDs.
 
 ---
@@ -121,12 +121,12 @@ whatever the link count. `npm run check:tracking` mints and verifies a full quar
 
 ## Deploying (Vercel)
 Set these in Project Settings → Environment Variables, then **redeploy**. `SIGNALS_PREVIEW` is read at build
-time for the gallery, so changing it needs a new build.
+time for the menu, so changing it needs a new build.
 
 | Variable | Production | Team demo deployment |
 |---|---|---|
 | `LINK_SECRET` | Required. Long random string, never rotated | Recommended |
-| `SIGNALS_PREVIEW` | Unset | `1` (gallery at `/`, hit viewer at `/api/hits`) |
+| `SIGNALS_PREVIEW` | Unset | `1` (template menu at `/`, hit viewer at `/api/hits`) |
 | `HITS_ENDPOINT` | BST-DB ingestion URL | Optional |
 | `REVALIDATE_SECRET`, `NEXT_PUBLIC_GA_ID` | As needed | Optional |
 
@@ -137,6 +137,6 @@ production, every link redirects to the public site and the server logs `LINK_SE
 - `robots.txt` disallows everything.
 - `noindex` meta and `X-Robots-Tag` on every response.
 - No sitemap, and no links into these pages anywhere.
-- Gallery and hit viewer exist only with `SIGNALS_PREVIEW=1`.
+- The template menu and hit viewer exist only with `SIGNALS_PREVIEW=1`.
 - Every link URL is gated by `proxy.ts`: no valid signed token means a redirect to the public site.
 - Any other path is a plain 404.
