@@ -119,9 +119,24 @@ whatever the link count. `npm run check:tracking` mints and verifies a full quar
 - Every parent page carries the StockDashboard section, below the six blocks, with its own tracked link that
   opens in a new tab and passes UTM tags only.
 
+## Deploying (Vercel)
+Set these in Project Settings → Environment Variables, then **redeploy**. `SIGNALS_PREVIEW` is read at build
+time for the gallery, so changing it needs a new build.
+
+| Variable | Production | Team demo deployment |
+|---|---|---|
+| `LINK_SECRET` | Required. Long random string, never rotated | Recommended |
+| `SIGNALS_PREVIEW` | Unset | `1` (gallery at `/`, hit viewer at `/api/hits`) |
+| `HITS_ENDPOINT` | BST-DB ingestion URL | Optional |
+| `REVALIDATE_SECRET`, `NEXT_PUBLIC_GA_ID` | As needed | Optional |
+
+Without `SIGNALS_PREVIEW`, `/` is a 404 by design: there is no public index of these pages. Without `LINK_SECRET` in
+production, every link redirects to the public site and the server logs `LINK_SECRET must be set in production`.
+
 ## Not discoverable
 - `robots.txt` disallows everything.
 - `noindex` meta and `X-Robots-Tag` on every response.
 - No sitemap, and no links into these pages anywhere.
 - Gallery and hit viewer exist only with `SIGNALS_PREVIEW=1`.
 - Every link URL is gated by `proxy.ts`: no valid signed token means a redirect to the public site.
+- Any other path is a plain 404.
